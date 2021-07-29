@@ -30,7 +30,6 @@ def rescale(img, scale):
 	
 	row = img.shape[0] #initial number of row	
 	column = img.shape[1] #initial number of column	
-	# ~ im = transform.rescale(img, scale, order=1, mode='reflect', preserve_range=1, anti_aliasing =0, multichannel=0) #rescale image
 	im = transform.rescale(img, scale, order=1)#, mode='reflect', preserve_range=1, anti_aliasing =0, multichannel=0) #rescale image
 	im = im.astype(np.float32) #convert image to float32
 	rowOffset = int((im.shape[0] - row)/2) #calculate number of row created and define offset to cut middle part of img only
