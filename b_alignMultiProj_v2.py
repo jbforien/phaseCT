@@ -5,38 +5,12 @@
 Holotomography module for aligning multi ATTEN projections
 """
 
-
-from distutils.version import StrictVersion 
 import numpy as np
-import os
-import glob
-from natsort import natsorted
-import joblib
-from joblib import Parallel, delayed
-import multiprocessing
-import warnings
-import numpy as np
-import matplotlib.pyplot as plt
-from skimage import data, segmentation, color, filters, io, morphology, measure#, img_as_uint, img_as_float
-from skimage.feature import register_translation
-from skimage.feature.register_translation import _upsampled_dft
 from scipy.ndimage import fourier_shift
-from sklearn import linear_model, datasets
-import matplotlib
-import multiprocessing
 from scipy import stats
-
-
-#check if joblib version package is at least 0.13.1. Otherwise following error will pop-up:
-'''
-ImportError: [joblib] Attempting to do parallel computing without protecting your import on a system that does not support forking.
-To use parallel-computing in a script, you must protect you main loop using "if __name__ == '__main__'". 
-Please see the joblib documentation on Parallel for more information
-'''
-if StrictVersion(joblib.__version__)<StrictVersion("0.13.1"):
-	print("please update joblib to version 0.13.1")
-	print("> pip install joblib --upgrade")
-	exit()
+from skimage import io
+from skimage.feature import register_translation
+from sklearn import linear_model
 
 def shiftImage(img, shift):	
 	offset_img = fourier_shift(np.fft.fftn(img), shift)
@@ -87,17 +61,4 @@ def fit_RANSAC(x, y):
 		intercept = ransac.estimator_.intercept_	
 		shiftCorr = x * slope + intercept
 	
-	
-	# ~ '''plot linear RANSAC fitting results '''
-	# ~ lw = 2
-	# ~ plt.scatter(x[inlier_mask], y[inlier_mask], color='violet', marker='o',
-				# ~ label='y-Inliers')
-	# ~ plt.scatter(x[outlier_mask], y[outlier_mask], color='lightcoral', marker='o',
-				# ~ label='y-Outliers')
-	# ~ plt.plot(line_X, line_y, color='darkorchid', linewidth=lw, label='y-Linear reg')
-	# ~ plt.plot(line_X, line_y_ransac, color='pink', linewidth=lw,
-			 # ~ label='y-RANSAC reg')
-	# ~ plt.show()
-	
-	# ~ return shiftCorr
 	return slope, intercept
