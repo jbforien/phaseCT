@@ -7,7 +7,6 @@ Holotomography module for resizing image
 
 import numpy as np
 from skimage import io, transform
-
 	
 def rescale(img, scale):
 	'''
