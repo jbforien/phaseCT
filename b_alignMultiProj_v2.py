@@ -5,25 +5,92 @@
 Holotomography module for aligning multi ATTEN projections
 """
 
+import imreg_dft as ird
+import matplotlib.pyplot as plt
 import numpy as np
+import os
+import pyfftw #requires scipy 1.3.3 (pip install scipy==1.3.3)
+
+from skimage.registration import phase_cross_correlation
+from skimage.registration._phase_cross_correlation import _upsampled_dft
+
 from scipy.ndimage import fourier_shift
-from scipy import stats
-from skimage import io
-from skimage.feature import register_translation
 from sklearn import linear_model
+from scipy import stats
 
 def shiftImage(img, shift):	
-	offset_img = fourier_shift(np.fft.fftn(img), shift)
-	offset_img = np.fft.ifftn(offset_img)
+	offset_img = fourier_shift(pyfftw.interfaces.numpy_fft.fftn(img), shift)
+	offset_img = pyfftw.interfaces.numpy_fft.ifftn(offset_img)
 	offset_img = np.real(offset_img)
 	offset_img = offset_img.astype(np.float32)	
 	return offset_img
 
-def crossCorrelateImage(img1, img2):
-	shift, error, diffphase = register_translation(img1, img2, 20)
+def crossCorr_imreg_dft(img1, img2):
+	# ~ filter_pcorr (int) – Radius of the minimum spectrum filter for translation detection, use the filter when detection fails. Values > 3 are likely not useful.
+	shift = ird.translation(img1, img2, filter_pcorr=8, odds=1)
+	shift = shift["tvec"].round(4)	
+	return np.asarray([shift[1],shift[0]])
+
+
+def crossCorr_skimage_fourier(img1, img2):
+	shift, error, diffphase = phase_cross_correlation(img1, img2, upsample_factor=100, space='fourier')
 	return shift
 
-def fit_RANSAC(x, y):		
+def crossCorr_skimage_real(img1, img2):
+	shift, error, diffphase = phase_cross_correlation(img1, img2, upsample_factor=1, space='real')
+	return np.asarray([shift[1],shift[0]])
+
+
+from dipy.viz import regtools
+from dipy.data import fetch_stanford_hardi, read_stanford_hardi
+from dipy.data.fetcher import fetch_syn_data, read_syn_data
+from dipy.align.imaffine import (transform_centers_of_mass,
+									AffineMap,
+									MutualInformationMetric,
+									AffineRegistration)
+from dipy.align.transforms import (TranslationTransform2D,
+									TranslationTransform3D,
+									RigidTransform2D,
+									RigidTransform3D,
+									AffineTransform2D,
+									AffineTransform3D)
+
+def mutualInfo_dipy(img1, img2):	
+	img1_grid2world = np.identity(3)	
+	img2_grid2world = np.identity(3)	
+		
+	# compute center of mass	
+	c_of_mass = transform_centers_of_mass(img1, img1_grid2world,
+										img2, img2_grid2world)	
+	
+	x_shift = c_of_mass.affine[1,-1]
+	y_shift = c_of_mass.affine[0,-1]
+	
+	# prepare affine registration
+	nbins = 32
+	sampling_prop = None
+	metric = MutualInformationMetric(nbins, sampling_prop)
+	level_iters = [10000, 1000, 100]
+	sigmas = [3.0, 1.0, 0.0]
+	factors = [4, 2, 1]	
+	affreg = AffineRegistration(metric=metric,
+									level_iters=level_iters,
+									sigmas=sigmas,
+									factors=factors)
+
+	# translation								
+	translation = affreg.optimize(img1, img2, TranslationTransform2D(), None,
+									img1_grid2world, img2_grid2world,
+									starting_affine=c_of_mass.affine)
+	
+	x_shift = translation.affine[1,-1]
+	y_shift = translation.affine[0,-1]
+	return np.asarray([-x_shift,-y_shift])
+	
+
+
+
+def lin_RANSAC(x, y):		
 	#calculate shift
 	yy = y
 	xx = x
@@ -61,4 +128,5 @@ def fit_RANSAC(x, y):
 		intercept = ransac.estimator_.intercept_	
 		shiftCorr = x * slope + intercept
 	
+
 	return slope, intercept
