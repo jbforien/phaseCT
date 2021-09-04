@@ -5,7 +5,14 @@ import time
 import scipy
 from scipy import ndimage, misc
 
-
+def OTF(x, a1, a2, a3, a4, b1, b2, b3, c1, c2):
+	b4 = c2 - c1 - b1 - b2 - b3
+	print(b4)	
+	return (b1*np.exp(-1*(np.pi*a1)**2*x)+
+			b2*np.exp(-1*(np.pi*a2)**2*x)+
+			b3*np.exp(-1*(np.pi*a3)**2*x)+
+			b4*np.exp(-1*(np.pi*a4)**2*x))
+			
     
 def Energy2Wavelength(keV):
 	"""
@@ -17,11 +24,10 @@ def Energy2Wavelength(keV):
 	return 1000*h*c / (JperkeV*keV*1000)
     
 
-def Paganin(rad, wlen, dist, delta, beta, fx, fy, Rm, alpha):    		
+def Paganin(rad, wlen, dist, delta, beta, fx, fy, Rm):    		
 	rad_freq = pyfftw.interfaces.numpy_fft.fft2(rad)
 
 	'''from Paganin et al., 2002'''
-	#~ alpha=0
 	#~ mu = (4 * np.pi * beta) / wlen
 	#~ phase = (rad_freq * mu) / (alpha+delta*dist*4*(np.pi**2)*(fx**2+fy**2)*Rm+mu) # 4 * pi^2 not explicit in manuscript
 	#~ phase = np.real(pyfftw.interfaces.numpy_fft.ifft2(phase))
@@ -33,6 +39,7 @@ def Paganin(rad, wlen, dist, delta, beta, fx, fy, Rm, alpha):
 	trans_func = np.log(np.real( pyfftw.interfaces.numpy_fft.ifft2( rad_freq / filtre)))
 	phase = (delta/(2*beta)) * trans_func
 		
+	#~ phase = phase *(-wlen)/(2*np.pi*delta)
 	return phase    
 
 def multiPaganin(rads, wlen, dists, delta, beta, fx, fy, Rm, alpha):
@@ -340,9 +347,11 @@ def invLaplacian(rads,pix_width,fx,fy,alpha):
 
 	"""
 		
+	# ~ rads_freq = np.fft.fft2(rads,pix_width)
 	rads_freq = pyfftw.interfaces.numpy_fft.fft2(rads)
 	res = rads_freq/(fx**2+fy**2+alpha)
 	res[0,0] = 0. + 0.j    
+	# ~ res = -(1/(4*np.pi**2))*get_inv_fft(res).real
 	res = -(1/(4*np.pi**2))*pyfftw.interfaces.numpy_fft.ifft2(res).real
 	return res
 
@@ -437,6 +446,4 @@ def WTIE(rads,wlen,dists,pix_width,fx,fy,Rm,alpha):
 	res[0,0] = 0.
 	res = res.real
 	return res
-
-
 
