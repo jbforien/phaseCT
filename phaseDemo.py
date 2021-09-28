@@ -40,12 +40,12 @@ if StrictVersion(joblib.__version__)<StrictVersion("0.13.1"):
 ########################################################################
 
 #choose type of phase retrieval algorithm to use
-'''        CTF - CTFPurePhase - CTFPurePhaseWithAbs - multiCTF            '''
+'''        CTF - CTFPurePhase - CTFPurePhaseWithAbs - homoCTF            '''
 '''        TIE - WTIE                                                     '''
 '''        Paganin - multiPaganin                                         '''
 '''        mixedAppr_homo                                                '''
 
-phaseRetAlgo = 'multiCTF' 
+phaseRetAlgo = 'homoCTF' 
 inputDir = r"main directory path"
 pathProj1 = inputDir + os.sep + 'folder_1'
 pathProj2 = inputDir + os.sep + 'folder_2'
@@ -251,7 +251,7 @@ phase-retrieval algorithm:
 CTF                    (rads, wlen, dists, fx, fy, Rm alpha)
 CTFPurePhase        (rads, wlen, dists, delta, beta, fx, fy, Rm, alpha)
 CTFPurePhaseWithAbs    (rads, wlen, dists, delta, beta, fx, fy, Rm, alpha)
-multiCTF            (rads, wlen, dists, delta, beta, fx, fy, Rm alpha)
+homoCTF            (rads, wlen, dists, delta, beta, fx, fy, Rm alpha)
 TIE                    (rads, wlen, dists, pix_width, fx, fy, Rm, alpha)
 WTIE                (rads, wlen, dists, pix_width, fx, fy, Rm, alpha)
 Paganin                (rad,  wlen, dist,  delta, beta, fx, fy, Rm)
@@ -274,8 +274,8 @@ def phaseRetrieval_task(projsPath, wlen, dists, pix_width, fx, fy, Rm, alpha, ou
         phase = c_phaseRetrieval_v3.CTFPurePhaseWithAbs(projs, wlen, dists, delta, beta, fx, fy, Rm, alpha)
     elif phaseRetAlgo == 'CTFPurePhaseWithAbs':
         phase = c_phaseRetrieval_v3.CTFPurePhaseWithAbs(projs, wlen, dists, delta, beta, fx, fy, Rm, alpha)
-    if phaseRetAlgo == 'multiCTF':
-        phase = c_phaseRetrieval_v3.multiCTF(projs, wlen, dists, delta, beta, fx, fy, Rm, alpha)
+    if phaseRetAlgo == 'homoCTF':
+        phase = c_phaseRetrieval_v3.homoCTF(projs, wlen, dists, delta, beta, fx, fy, Rm, alpha)
     elif phaseRetAlgo == 'TIE':
         phase = c_phaseRetrieval_v3.TIE(projs, wlen, dists, pix_width, fx, fy, Rm, alpha)
     elif phaseRetAlgo == 'WTIE':
