@@ -41,8 +41,8 @@ if StrictVersion(joblib.__version__)<StrictVersion("0.13.1"):
 
 #choose type of phase retrieval algorithm to use
 '''        CTF - CTFPurePhase - CTFPurePhaseWithAbs - homoCTF            '''
-'''        TIE - WTIE                                                     '''
-'''        Paganin - multiPaganin                                         '''
+'''        TIE - WTIE                                                    '''
+'''        Paganin - multiPaganin                                        '''
 '''        mixedAppr_homo                                                '''
 
 phaseRetAlgo = 'homoCTF' 
@@ -59,11 +59,11 @@ Parameter of the experiment
 '''
 sod = 21000                                             # source to detector distance in mm
 dists = [15,40,86,132]                                  # object to detector distance in mm
-energy = 35                                             #in keV
-pix_width = 0.65e-3                                     #in mm
+energy = 35                                             # in keV
+pix_width = 0.65e-3                                     # in mm
 delta = 1.90297703E-06  
 beta = 3.11117105E-08    
-nbCPU = 0.75                                             # in percent
+nbCPU = 75                                              # in percent
 
 #correct for detector response?
 detectCorr = 0                                            # 1 or  'yes'
@@ -125,7 +125,7 @@ pix_width = pix_width/maxMag
 wlen = c_phaseRetrieval_v3.Energy2Wavelength(energy)
 
 totalNbrCores = multiprocessing.cpu_count()                # find the number of cpu available
-nbCores = int(totalNbrCores*nbCPU)                        # define the number of cpu that will be used
+nbCores = int(totalNbrCores*nbCPU/100)                     # define the number of cpu that will be used
 
 newParamListValue = {'date time': now,
                      'magnification': list(mag),

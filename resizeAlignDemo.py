@@ -48,8 +48,8 @@ listPathProj = [pathProj1, pathProj2, pathProj3, pathProj4]
 Parameter of the experiment
 '''
 sod = 21000                                             # source to detector distance in mm
-dists = [15,40,86,132]                                    # object to detector distance in mm
-energy = 35                                                # in keV
+dists = [15,40,86,132]                                  # object to detector distance in mm
+energy = 35                                             # in keV
 pix_width = 0.65e-3                                     # in mm
 preProcessingInterval = 100
 finalInterval = 1
@@ -66,21 +66,21 @@ outliersMaskPath6 = inputDir + os.sep + 'folder_6' + os.sep + '000000_mask.tif'
 listOutliersMaskPath = [outliersMaskPath1, outliersMaskPath2, outliersMaskPath3, outliersMaskPath4, outliersMaskPath5, outliersMaskPath6]
 gaussFltrSig = 7
 
-performPaganin = 1                                        # enhance constrast with Paganin
+performPaganin = 1                                      # enhance constrast with Paganin
 delta = 1.40904535E-06  
 beta= 5.39533251E-10
-unsharpMask = 0                                            # perform unsharp mask
-gaussianBlur = 0; sigmaBlur = 1                            # perform gaussian blur
+unsharpMask = 0                                         # perform unsharp mask
+gaussianBlur = 0; sigmaBlur = 1                         # perform gaussian blur
 
-registration_algorithm = 'crossCorr_imreg_dft'            # crossCorr_imreg_dft, crossCorr_skimage_fourier, crossCorr_skimage_real, mutualInfo_dipy
+registration_algorithm = 'crossCorr_imreg_dft'          # crossCorr_imreg_dft, crossCorr_skimage_fourier, crossCorr_skimage_real, mutualInfo_dipy
 
-fitting_method = 'meanNoOutliers'                        # lin_RANSAC, polynomial, meanNoOutliers
+fitting_method = 'meanNoOutliers'                       # lin_RANSAC, polynomial, meanNoOutliers
 polynomial_order = 0                                    # choose polynomial order, not used for 'lin_RANSAC'
 plotShift = 0
 
 shiftMethod = 'real'                                    # choose shift method - 'real' or 'fft'
 
-nbCPU = 0.75                                             # Nbr of CPU to use in percent
+nbCPU = 75                                              # Nbr of CPU to use in percent
 
 ########################################################################
 ################# NO NEED TO CHANGE BELOW THESE LINES ##################
@@ -95,8 +95,8 @@ maxMag = np.amax(mag)
 pix_width = pix_width/maxMag
 wlen = c_phaseRetrieval_v3.Energy2Wavelength(energy)
 
-totalNbrCores = multiprocessing.cpu_count()                # find the number of cpu available
-nbCores = int(totalNbrCores*nbCPU)                        # define the number of cpu that will be used
+totalNbrCores = multiprocessing.cpu_count()             # find the number of cpu available
+nbCores = int(totalNbrCores*nbCPU/100)                  # define the number of cpu that will be used
 
 
 '''
