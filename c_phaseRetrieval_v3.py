@@ -129,7 +129,7 @@ def sglDstCTF(rad, wlen, dist, delta, beta, fx, fy, Rm, alpha):
     return phase
 
 
-def multiCTF(rads, wlen, dists, delta, beta, fx, fy, Rm, alpha):
+def homoCTF(rads, wlen, dists, delta, beta, fx, fy, Rm, alpha):
     """
 
 
